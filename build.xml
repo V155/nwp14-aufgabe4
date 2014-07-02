@@ -1,0 +1,53 @@
+<project name="nwp14-aufgabe4" basedir="." default="main">
+
+    <property name="src.dir"     value="src"/>
+    <property name="classes.dir" value="bin"/>
+    <property name="jar.dir"     value="build"/>
+    <property name="lib.dir"     value="lib"/>
+    <property name="main.class"  value="de.reichwald.fh.nwp14.aufgabe4"/>
+    <property name="one-jar.dist.dir" value="./onejar"/>
+    <import file="${one-jar.dist.dir}/one-jar-ant-task.xml" optional="true"/>
+
+    <path id="classpath">
+      <fileset dir="${lib.dir}" includes="**/*.jar"/>
+    </path>
+
+
+    <target name="clean">
+      <delete dir="${classes.dir}"/>
+      <delete dir="${jar.dir}"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac includeantruntime="false"
+	       srcdir="${src.dir}"
+	       destdir="${classes.dir}"
+	       classpathref="classpath"/>
+    </target>
+
+    <target name="jar" depends="compile">
+      <mkdir dir="${jar.dir}"/>
+      <one-jar destfile="${jar.dir}/${ant.project.name}.jar"
+	       onejarmainclass="${main.class}">
+            <main>
+                <fileset dir="${classes.dir}"/>
+            </main>
+            <lib>
+                <fileset dir="${lib.dir}" />
+            </lib>
+	    <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+        </one-jar>
+    </target>
+
+     <target name="run" depends="jar">
+        <java jar="${jar.dir}/${ant.project.name}.jar" fork="true"/>
+    </target>
+
+    <target name="clean-build" depends="clean,jar"/>
+
+    <target name="main" depends="clean,run"/>
+
+</project>
