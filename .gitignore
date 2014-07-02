@@ -15,6 +15,7 @@
 *.exe
 *.out
 *.app
+*.class
 
 #vim swap files
 *.swp
