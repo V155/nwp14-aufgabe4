@@ -4,7 +4,7 @@
     <property name="classes.dir" value="bin"/>
     <property name="jar.dir"     value="build"/>
     <property name="lib.dir"     value="lib"/>
-    <property name="main.class"  value="de.reichwald.fh.nwp14.aufgabe4"/>
+    <property name="main.class"  value="de.reichwald.fh.nwp14.Aufgabe4"/>
     <property name="one-jar.dist.dir" value="./onejar"/>
     <import file="${one-jar.dist.dir}/one-jar-ant-task.xml" optional="true"/>
 
