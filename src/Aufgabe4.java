@@ -16,15 +16,20 @@ public class Aufgabe4{
 	    String line;
 	    while ((line = br.readLine()) != null) {
 		// process the line.
-		if(Pattern.matches("^([0-9][0-9]:){2}[0-9]{2}.[0-9]{6} IP", line)){
+		// ^([0-9][0-9]:){2}[0-9]{2}.[0-9]{6} IP
+		if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6} IP.*"))
 		    System.out.println(line);
-		    
+		
+
+		
 	    }
 	    br.close();
-	}catch(FileNotFoundException e){
-	}catch(IOException e){
 	}
+	catch(FileNotFoundException e){
+	}
+	catch(IOException e){
+	}
+	
 	
     }
 }
-    
