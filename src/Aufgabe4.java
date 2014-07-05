@@ -16,25 +16,27 @@ public class Aufgabe4
     {
 	try{
 	    BufferedReader br = new BufferedReader(new FileReader("tcpdump.dump"));
-	    String line;
+	    String line = "";
 	    String output = "";
 	    boolean next = false;
 	    boolean first = true;
-	    
-	    while ((line = br.readLine()) != null) {
+
+	    while (line!=null) {
 		// process the line.
 		// ^([0-9][0-9]:){2}[0-9]{2}.[0-9]{6} IP
-		if(first && line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.* IPv4 .*"))
+		if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.* IPv4 .*"))
 		    {
-			first = false;
 			output=new String(line);
-			next = true;
-		    }else if(next && line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.* IPv4 .*")==false){
-		    output = output + "\n" + line;
-		}else if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.* IPv4 .*") && next){
-		    System.out.println(output);		    
-		    output=new String(line);
-		}
+			while((line = br.readLine()) != null && line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.*")==false)
+			    {
+				output = output + "\n" + line;
+			    }
+			System.out.println(output);
+		    }
+		//else if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.* IPv4 .*") && next){
+		//  System.out.println(output);		    
+		//  output=new String(line);
+		//}
 		
 	    }
 	    System.out.println(output);
