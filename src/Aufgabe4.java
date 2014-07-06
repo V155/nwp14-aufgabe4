@@ -21,17 +21,24 @@ public class Aufgabe4
 	    boolean next = false;
 	    boolean first = true;
 
-	    while (line!=null) {
+	    while ((line = br.readLine()) !=null) {
 		// process the line.
 		// ^([0-9][0-9]:){2}[0-9]{2}.[0-9]{6} IP
 		if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.* IPv4 .*"))
 		    {
 			output=new String(line);
-			while((line = br.readLine()) != null && line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.*")==false)
+			for (int i=0; i < 3; i++)
 			    {
-				output = output + "\n" + line;
+				if ((line = br.readLine()) != null){
+				    output = output + "\n" + line;
+				    if (i == 2)
+					{
+					    System.out.println(line);
+					    output = output + "\n" + (line.split(" "))[6] + (line.split(" "))[7];
+					}
+				}
 			    }
-			System.out.println(output);
+			//System.out.println(output);
 		    }
 		//else if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.* IPv4 .*") && next){
 		//  System.out.println(output);		    
@@ -39,8 +46,7 @@ public class Aufgabe4
 		//}
 		
 	    }
-	    System.out.println(output);
-	    
+	  	    
 	    br.close();
 	}
 	catch(FileNotFoundException e){
