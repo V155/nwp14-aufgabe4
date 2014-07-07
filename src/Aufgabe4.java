@@ -14,7 +14,15 @@ public class Aufgabe4
     public static void main(String args[])
     {
 	ArrayList<IpPackage> list1 = readTcpdump();
+	for (IpPackage pkg : list1){
+	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getSeqNr() + ", " + pkg.getTimestamp() + ", " + pkg.getrseqNr() + ", " + pkg.getAckIn() + ", " + pkg.getAckNr());
+	}
+	System.out.println("----------------------------------------------\n\n\n\n");
 	ArrayList<TrptPackage> list2 = readTrptdump();
+	ArrayList<IpPackage> list3 = mergePackages(list1);
+	for (IpPackage pkg : list3){
+	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getSeqNr() + ", " + pkg.getTimestamp() + ", " + pkg.getrseqNr() + ", " + pkg.getAckIn() + ", " + pkg.getAckNr());
+	}
     }
 
     public static ArrayList<TrptPackage> readTrptdump(){
@@ -54,7 +62,7 @@ public class Aufgabe4
 	    }
 	    br.close();
 	    for (TrptPackage trptpackage : trptPackageList){
-		System.out.println(trptpackage.getSeqNr() + ", " + trptpackage.getRto());
+		//		System.out.println(trptpackage.getSeqNr() + ", " + trptpackage.getRto());
 	    }
 	}
 	catch(FileNotFoundException e){
@@ -76,13 +84,14 @@ public class Aufgabe4
 	    int nr = 1;
 	    String ackNr = "";
 	    String rseqNr = "";
+	    String timestamp = "";
 	    
 	    while ((line = br.readLine()) !=null) {
 		if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6} IP .*"))
 		    {
 			output=new String(line);
 			nr++;
-
+			timestamp = line.split(" ")[0];
 			for (int i=0; i < 4; i++)
 			    {
 				if ((line = br.readLine()) != null){
@@ -92,8 +101,6 @@ public class Aufgabe4
 					rseqNr = rseqNr.substring(rseqNr.indexOf('q')+2);
 					ackNr = line.split(",")[3];
 					ackNr = ackNr.substring(ackNr.indexOf('k')+2);
-					System.out.println(rseqNr + " " + ackNr);    
-
 				    } else if (i==0) {
 
 					if (line.split(",")[1].matches(".*cksum .*")){
@@ -103,8 +110,6 @@ public class Aufgabe4
 					    rseqNr = line.split(",")[1];
 					    rseqNr = rseqNr.substring(rseqNr.indexOf('q')+2).split(":")[1];
 					}
-				  
-					System.out.println(rseqNr);    
 
 				    }
 
@@ -114,12 +119,13 @@ public class Aufgabe4
 					}
 				}
 			    }
-			ipPackageList.add(new IpPackage(""+nr, output, seqNr, "rtt", "rto", "timestamp"));
+			ipPackageList.add(new IpPackage(""+nr, output, seqNr, "rtt", "rto", timestamp, rseqNr, ackNr));
+			ackNr = new String();
 		    }
 	    }
 	    br.close();
 	    for (IpPackage ippackage : ipPackageList){
-		System.out.println(ippackage.getSeqNr());
+		//		System.out.println(ippackage.getSeqNr());
 	    }
 	    
 	}
@@ -127,7 +133,33 @@ public class Aufgabe4
 	}
 	catch(IOException e){
 	}
-	return new ArrayList<IpPackage>();
+	return ipPackageList;
+    }
+
+    public static ArrayList<IpPackage> mergePackages(ArrayList<IpPackage> iplist){
+
+	ArrayList<IpPackage> deleteList = new ArrayList();
+	
+	for (IpPackage ipkg : iplist){
+	    if (ipkg.getrseqNr().equals("1")){
+		deleteList.add(ipkg);
+	    }else {
+		for (IpPackage ipkg2 : iplist){
+		    if (ipkg.getrseqNr().equals(ipkg2.getAckNr())){
+			ipkg.setAckIn(ipkg2.getTcpdumpNr());
+			ipkg.setAckTimestamp(ipkg2.getTimestamp());
+		    }
+		}
+	    }
+	}
+
+	System.out.println(iplist.size() + ", " + deleteList.size());
+
+	for (IpPackage deleteObject : deleteList){
+	    iplist.remove(deleteObject);
+	}
+	
+	return iplist;
     }
 
     public static ArrayList<IpPackage> mergeLists(ArrayList<IpPackage> iplist, ArrayList<TrptPackage> trptlist){

@@ -10,14 +10,18 @@ public class IpPackage{
     String ackNr;
     String ackTimestamp;
     String trptNr;
+    String rseqNr;
+    String ackIn;
     
-    public IpPackage(String tcpdumpNr, String dump, String seqNr, String rtt, String rto, String timestamp){
+    public IpPackage(String tcpdumpNr, String dump, String seqNr, String rtt, String rto, String timestamp, String rseqNr, String ackNr){
 	this.tcpdumpNr = tcpdumpNr;
 	this.dump = dump;
 	this.seqNr = seqNr;
 	this.rtt = rtt;
 	this.rto = rto;
 	this.timestamp = timestamp;
+	this.rseqNr = rseqNr;
+	this.ackNr = ackNr;
     }
 
     public String getDump(){
@@ -56,6 +60,18 @@ public class IpPackage{
 	return this.trptNr;
     }
 
+    public String getrseqNr(){
+	return this.rseqNr;
+    }
+
+    public String getAckIn(){
+	return this.ackIn;
+    }
+
+    public void setAckIn(String ackIn){
+	this.ackIn = ackIn;
+    }
+    
     public void setAckNr(String ackNr){
 	this.ackNr = ackNr;
     }
