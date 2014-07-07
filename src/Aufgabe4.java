@@ -1,16 +1,14 @@
 package de.reichwald.fh.nwp14;
+import de.reichwald.fh.nwp14.IpPackage;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.regex.Pattern;
+import java.util.ArrayList;
 
 public class Aufgabe4
 {
-
-    public Aufgabe4()
-    {
-    }
 
     public static void main(String args[])
     {
@@ -20,6 +18,7 @@ public class Aufgabe4
 	    String output = "";
 	    boolean next = false;
 	    boolean first = true;
+	    ArrayList<IpPackage> packageList = new ArrayList();
 
 	    while ((line = br.readLine()) !=null) {
 		// process the line.
@@ -33,8 +32,8 @@ public class Aufgabe4
 				    output = output + "\n" + line;
 				    if (i == 2)
 					{
-					    System.out.println(line);
-					    output = output + "\n" + (line.split(" "))[6] + (line.split(" "))[7];
+					     
+					    output = output + "\n" + line.substring(42,46) + line.substring(47,51);
 					}
 				}
 			    }
