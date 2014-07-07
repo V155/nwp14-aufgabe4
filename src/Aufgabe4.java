@@ -106,6 +106,10 @@ public class Aufgabe4
 	return new ArrayList<IpPackage>();
     }
 
+    public static ArrayList<IpPackage> mergeLists(ArrayList<IpPackage> iplist, ArrayList<TrptPackage> trptlist){
+	return new ArrayList<IpPackage>();
+    }
+
     public static void calculateRtt(){
     }
 
