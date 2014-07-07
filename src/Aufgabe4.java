@@ -74,16 +74,40 @@ public class Aufgabe4
 	    String output = "";
 	    String seqNr = "";
 	    int nr = 1;
+	    String ackNr = "";
+	    String rseqNr = "";
 	    
 	    while ((line = br.readLine()) !=null) {
 		if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6} IP .*"))
 		    {
 			output=new String(line);
 			nr++;
+
 			for (int i=0; i < 4; i++)
 			    {
 				if ((line = br.readLine()) != null){
 				    output = output + "\n" + line;
+				    if (i == 0 && line.matches(".*, ack [0-9]{2,12}, .*")){
+					rseqNr = line.split(",")[2];
+					rseqNr = rseqNr.substring(rseqNr.indexOf('q')+2);
+					ackNr = line.split(",")[3];
+					ackNr = ackNr.substring(ackNr.indexOf('k')+2);
+					System.out.println(rseqNr + " " + ackNr);    
+
+				    } else if (i==0) {
+
+					if (line.split(",")[1].matches(".*cksum .*")){
+					    rseqNr = line.split(",")[2];
+					    rseqNr = rseqNr.substring(rseqNr.indexOf('q')+2);
+					} else {
+					    rseqNr = line.split(",")[1];
+					    rseqNr = rseqNr.substring(rseqNr.indexOf('q')+2).split(":")[1];
+					}
+				  
+					System.out.println(rseqNr);    
+
+				    }
+
 				    if (i == 3)
 					{
 					    seqNr = new String(line.substring(35,39) + line.substring(40,44));
@@ -107,6 +131,13 @@ public class Aufgabe4
     }
 
     public static ArrayList<IpPackage> mergeLists(ArrayList<IpPackage> iplist, ArrayList<TrptPackage> trptlist){
+
+	//bad code follows. I appreciate any hint to make it better
+	for (IpPackage ipkg : iplist){
+	    for (TrptPackage tpgk : trptlist){
+		//		if(ipkg.
+	    }
+	}
 	return new ArrayList<IpPackage>();
     }
 
