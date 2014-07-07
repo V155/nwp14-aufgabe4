@@ -21,7 +21,7 @@ public class Aufgabe4
 	ArrayList<TrptPackage> list2 = readTrptdump();
 	ArrayList<IpPackage> list3 = mergePackages(list1);
 	for (IpPackage pkg : list3){
-	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getSeqNr() + ", " + pkg.getTimestamp() + ", " + pkg.getrseqNr() + ", " + pkg.getAckIn() + ", " + pkg.getAckNr());
+	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getSeqNr() + ", " + pkg.getTimestamp() + ", " + pkg.getrseqNr() + ", " + pkg.getAckIn() + ", " + pkg.getAckNr() + ", " + pkg.getAckTimestamp() + "\n" + pkg.getDump());
 	}
     }
 
@@ -115,7 +115,7 @@ public class Aufgabe4
 
 				    if (i == 3)
 					{
-					    seqNr = new String(line.substring(35,39) + line.substring(40,44));
+					    seqNr = new String(line.substring(25,29) + line.substring(30,34));
 					}
 				}
 			    }
