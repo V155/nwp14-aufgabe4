@@ -13,7 +13,7 @@ public class Aufgabe4
 
     public static void main(String args[])
     {
-	//	ArrayList<IpPackage> list1 = readTcpdump();
+	ArrayList<IpPackage> list1 = readTcpdump();
 	ArrayList<TrptPackage> list2 = readTrptdump();
     }
 
@@ -25,11 +25,13 @@ public class Aufgabe4
 	    String line = "";
 	    String output = "";
 	    String seqNr = "";
-	    String rto = "";		
+	    String rto = "";
+	    String nr = "";
 
 	    while ((line = br.readLine()) != null) {
 		if(line.matches("^[0-9]{3} (ESTABLISHED:output|ESTABLISHED:input|SYN_SENT:input) .*")){
 		    output = new String(line);
+		    nr = new String(line.substring(0, line.indexOf(' ')));
 		    if(line.matches("^[0-9]{3} (ESTABLISHED:input|SYN_SENT:input) .*")){
 			int index1 = line.indexOf(')')+1;
 			seqNr = new String(line.substring(index1,index1+8));
@@ -47,7 +49,7 @@ public class Aufgabe4
 			    }
 			}
 		    }
-		    trptPackageList.add(new TrptPackage(output, seqNr, rto));
+		    trptPackageList.add(new TrptPackage(nr, output, seqNr, rto));
 		}
 	    }
 	    br.close();
@@ -71,32 +73,25 @@ public class Aufgabe4
 	    String line = "";
 	    String output = "";
 	    String seqNr = "";
+	    int nr = 1;
 	    
 	    while ((line = br.readLine()) !=null) {
-		// process the line.
-		// ^([0-9][0-9]:){2}[0-9]{2}.[0-9]{6} IP
 		if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6} IP .*"))
 		    {
 			output=new String(line);
+			nr++;
 			for (int i=0; i < 4; i++)
 			    {
 				if ((line = br.readLine()) != null){
 				    output = output + "\n" + line;
 				    if (i == 3)
 					{
-					    
 					    seqNr = new String(line.substring(35,39) + line.substring(40,44));
 					}
 				}
 			    }
-			ipPackageList.add(new IpPackage(output, seqNr, "rtt", "rto", "timestamp", "tcpdumpNr"));
-			//System.out.println(output);
+			ipPackageList.add(new IpPackage(""+nr, output, seqNr, "rtt", "rto", "timestamp"));
 		    }
-		//else if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.* IPv4 .*") && next){
-		//  System.out.println(output);		    
-		//  output=new String(line);
-		//}
-		
 	    }
 	    br.close();
 	    for (IpPackage ippackage : ipPackageList){
@@ -110,7 +105,14 @@ public class Aufgabe4
 	}
 	return new ArrayList<IpPackage>();
     }
-    
+
+    public static void calculateRtt(){
+    }
+
+    public static void printCsv(ArrayList<IpPackage> ippackagelist, ArrayList<TrptPackage> trptpackageList){
+	System.out.println();
+	
+    }
     
 }
 
