@@ -21,7 +21,7 @@ public class Aufgabe4
 	ArrayList<TrptPackage> list2 = readTrptdump();
 	ArrayList<IpPackage> list3 = mergePackages(list1);
 	for (IpPackage pkg : list3){
-	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getSeqNr() + ", " + pkg.getTimestamp() + ", " + pkg.getrseqNr() + ", " + pkg.getAckIn() + ", " + pkg.getAckNr() + ", " + pkg.getAckTimestamp() + "\n" + pkg.getDump());
+	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getSeqNr() + ", " + pkg.getTimestamp() + ", " + pkg.getrseqNr() + ", " + pkg.getAckIn() + ", " + pkg.getAckNr() + ", " + pkg.getAckTimestamp());
 	}
     }
 
@@ -155,8 +155,14 @@ public class Aufgabe4
 
 	System.out.println(iplist.size() + ", " + deleteList.size());
 
+	//because the ACK package from handshake got rseqNr 1 but should not be deleted
+	boolean firstPackage = true;
 	for (IpPackage deleteObject : deleteList){
-	    iplist.remove(deleteObject);
+	    if(firstPackage){
+		firstPackage = false;
+	    }else {
+		iplist.remove(deleteObject);
+	    }
 	}
 	
 	return iplist;
