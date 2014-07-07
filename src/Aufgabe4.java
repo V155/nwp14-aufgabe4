@@ -12,13 +12,14 @@ public class Aufgabe4
 
     public static void main(String args[])
     {
+	ArrayList<IpPackage> packageList = new ArrayList();
 	try{
 	    BufferedReader br = new BufferedReader(new FileReader("tcpdump.dump"));
 	    String line = "";
 	    String output = "";
+	    String seqNr = "";
 	    boolean next = false;
 	    boolean first = true;
-	    ArrayList<IpPackage> packageList = new ArrayList();
 
 	    while ((line = br.readLine()) !=null) {
 		// process the line.
@@ -33,10 +34,11 @@ public class Aufgabe4
 				    if (i == 2)
 					{
 					     
-					    output = output + "\n" + line.substring(42,46) + line.substring(47,51);
+					    seqNr = new String(line.substring(42,46) + line.substring(47,51));
 					}
 				}
 			    }
+			packageList.add(new IpPackage(output, seqNr, "rtt", "rto", "timestamp", "tcpdumpNr"));
 			//System.out.println(output);
 		    }
 		//else if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6}.* IPv4 .*") && next){
@@ -45,8 +47,11 @@ public class Aufgabe4
 		//}
 		
 	    }
-	  	    
 	    br.close();
+	    for (IpPackage ippackage : packageList){
+		System.out.println(ippackage.getSeqNr());
+	    }
+
 	}
 	catch(FileNotFoundException e){
 	}
