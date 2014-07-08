@@ -162,14 +162,19 @@ public class Aufgabe4
 		    long lUpperSeqNr = Long.parseLong(upperSeqNr, 16);
 		    lUpperSeqNr = lUpperSeqNr + ipkg.getLength();
 		    upperSeqNr = Long.toHexString(lUpperSeqNr);
-		    long seqInfo = Long.parseLong(ipkg.getSeqNr(),16) - firstSeqNr;
-		    ipkg.setSeqInfo(seqInfo);
+		    
+		    
 		    
 		    if (upperSeqNr.equals(ipkg2.getAckNr())){
 			ipkg.setAckIn(ipkg2.getTcpdumpNr());
 			ipkg.setAckTimestamp(ipkg2.getTimestamp());
 		    }
 		}
+		long seqInfo = Long.parseLong(ipkg.getSeqNr(),16) - firstSeqNr;
+		ipkg.setSeqInfo(seqInfo);
+		
+		ipkg.setMsecs(ipkg.getTimestamp().split("\\.")[1]);
+
 	    }
 	}
 	for (IpPackage deleteObject : deleteList){
@@ -212,9 +217,9 @@ public class Aufgabe4
     }
 
     public static void printCsv(ArrayList<IpPackage> ipkglist){
-	System.out.println("TcpdumpNr, TrptNr, AckNr, Sendezeit, Empfangszeit, SeqNr, RTT, RTO, SeqInfo");
+	System.out.println("TcpdumpNr, TrptNr, AckNr, Sendezeit, Empfangszeit, SeqNr, RTT, RTO, SeqInfo, Sendezeit");
 	for (IpPackage pkg : ipkglist){
-	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getTrptNr() + ", " + pkg.getAckIn() + ", " + pkg.getTimestamp() + ", " + pkg.getAckTimestamp() + ", " + pkg.getSeqNr() + ", " + pkg.getRtt() + ", " + pkg.getRto() + ", " + pkg.getSeqInfo());
+	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getTrptNr() + ", " + pkg.getAckIn() + ", " + pkg.getTimestamp() + ", " + pkg.getAckTimestamp() + ", " + pkg.getSeqNr() + ", " + pkg.getRtt() + ", " + pkg.getRto() + ", " + pkg.getSeqInfo() + ", " + pkg.getMsecs());
 	}
 	
     }

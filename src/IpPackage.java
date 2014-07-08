@@ -14,6 +14,7 @@ public class IpPackage{
     String ackIn;
     int length;
     long seqInfo;
+    String msecs;
     
     public IpPackage(String tcpdumpNr, String dump, String seqNr, String rtt, String rto, String timestamp, String rseqNr, String ackNr, int length){
 	this.tcpdumpNr = tcpdumpNr;
@@ -25,6 +26,7 @@ public class IpPackage{
 	this.rseqNr = rseqNr;
 	this.ackNr = ackNr;
 	this.length = length;
+	
     }
 
     public String getDump(){
@@ -77,6 +79,14 @@ public class IpPackage{
 
     public long getSeqInfo(){
 	return this.seqInfo;
+    }
+
+    public String getMsecs(){
+	return this.msecs;
+    }
+
+    public void setMsecs(String msecs){
+	this.msecs = msecs;
     }
 
     public void setSeqInfo(Long seqInfo){
