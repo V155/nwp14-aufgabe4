@@ -7,22 +7,23 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
-
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 public class Aufgabe4
 {
 
     public static void main(String args[])
     {
 	ArrayList<IpPackage> list1 = readTcpdump();
-	for (IpPackage pkg : list1){
-	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getSeqNr() + ", " + pkg.getTimestamp() + ", " + pkg.getrseqNr() + ", " + pkg.getAckIn() + ", " + pkg.getAckNr());
-	}
-	System.out.println("----------------------------------------------\n\n\n\n");
 	ArrayList<TrptPackage> list2 = readTrptdump();
 	ArrayList<IpPackage> list3 = mergePackages(list1);
-	for (IpPackage pkg : list3){
-	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getSeqNr() + ", " + pkg.getTimestamp() + ", " + pkg.getrseqNr() + ", " + pkg.getAckIn() + ", " + pkg.getAckNr() + ", " + pkg.getAckTimestamp());
-	}
+	ArrayList<IpPackage> list4 = calculateRtt(list3);
+	ArrayList<IpPackage> list5 = mergeLists(list4, list2);
+	printCsv(list5);
+	
+	
     }
 
     public static ArrayList<TrptPackage> readTrptdump(){
@@ -37,16 +38,17 @@ public class Aufgabe4
 	    String nr = "";
 
 	    while ((line = br.readLine()) != null) {
-		if(line.matches("^[0-9]{3} (ESTABLISHED:output|ESTABLISHED:input|SYN_SENT:input) .*")){
+		if(line.matches("^[0-9]{3} (FIN_WAIT_1:input|ESTABLISHED:output|ESTABLISHED:input|SYN_SENT:input|SYN_SENT:output) .*")){
 		    output = new String(line);
-		    nr = new String(line.substring(0, line.indexOf(' ')));
-		    if(line.matches("^[0-9]{3} (ESTABLISHED:input|SYN_SENT:input) .*")){
+		    nr = line.split(" ")[0];
+		    if(line.matches("^[0-9]{3} (ESTABLISHED:input|SYN_SENT:input|SYN_SENT:output) .*")){
 			int index1 = line.indexOf(')')+1;
 			seqNr = new String(line.substring(index1,index1+8));
-		    }
-
-		    if(line.matches("^[0-9]{3} (ESTABLISHED:output) .*")){
+		    }else if(line.matches("^[0-9]{3} (ESTABLISHED:output) .*")){
 			int index1 = line.indexOf(')')+2;
+			seqNr = new String(line.substring(index1,index1+8));
+		    }else if(line.matches("^[0-9]{3} (FIN_WAIT_1:input) .*")){
+			int index1 = line.indexOf('@')+1;
 			seqNr = new String(line.substring(index1,index1+8));
 		    }
 		    for(int i = 0; i < 4; i++){
@@ -61,15 +63,13 @@ public class Aufgabe4
 		}
 	    }
 	    br.close();
-	    for (TrptPackage trptpackage : trptPackageList){
-		//		System.out.println(trptpackage.getSeqNr() + ", " + trptpackage.getRto());
-	    }
+	    
 	}
 	catch(FileNotFoundException e){
 	}
 	catch(IOException e){
 	}
-	return new ArrayList<TrptPackage>();
+	return trptPackageList;
     }
 		    
     
@@ -96,6 +96,7 @@ public class Aufgabe4
 			    {
 				if ((line = br.readLine()) != null){
 				    output = output + "\n" + line;
+				    /*
 				    if (i == 0 && line.matches(".*, ack [0-9]{2,12}, .*")){
 					rseqNr = line.split(",")[2];
 					rseqNr = rseqNr.substring(rseqNr.indexOf('q')+2);
@@ -111,11 +112,14 @@ public class Aufgabe4
 					    rseqNr = rseqNr.substring(rseqNr.indexOf('q')+2).split(":")[1];
 					}
 
-				    }
+					}*/
 
 				    if (i == 3)
 					{
-					    seqNr = new String(line.substring(25,29) + line.substring(30,34));
+					    //seqNr = new String(line.substring(25,29) + line.substring(30,34));
+					    String[] splitline = line.split(" ");
+					    seqNr = new String(splitline[5] + splitline[6]);
+					    ackNr = new String(splitline[7] + splitline[8]);
 					}
 				}
 			    }
@@ -124,12 +128,7 @@ public class Aufgabe4
 		    }
 	    }
 	    br.close();
-	    for (IpPackage ippackage : ipPackageList){
-		//		System.out.println(ippackage.getSeqNr());
-	    }
-	    
-	}
-	catch(FileNotFoundException e){
+	}catch(FileNotFoundException e){
 	}
 	catch(IOException e){
 	}
@@ -138,31 +137,27 @@ public class Aufgabe4
 
     public static ArrayList<IpPackage> mergePackages(ArrayList<IpPackage> iplist){
 
+
 	ArrayList<IpPackage> deleteList = new ArrayList();
+
+	long oneSeqNr = Long.parseLong(iplist.get(1).getSeqNr(), 16);
+	oneSeqNr++;
+	String refSeqNr = Long.toHexString(oneSeqNr);
 	
 	for (IpPackage ipkg : iplist){
-	    if (ipkg.getrseqNr().equals("1")){
+	    if (ipkg.getSeqNr().equals(refSeqNr)){
 		deleteList.add(ipkg);
 	    }else {
 		for (IpPackage ipkg2 : iplist){
-		    if (ipkg.getrseqNr().equals(ipkg2.getAckNr())){
+		    if (ipkg.getSeqNr().equals(ipkg2.getAckNr())){
 			ipkg.setAckIn(ipkg2.getTcpdumpNr());
 			ipkg.setAckTimestamp(ipkg2.getTimestamp());
 		    }
 		}
 	    }
 	}
-
-	System.out.println(iplist.size() + ", " + deleteList.size());
-
-	//because the ACK package from handshake got rseqNr 1 but should not be deleted
-	boolean firstPackage = true;
 	for (IpPackage deleteObject : deleteList){
-	    if(firstPackage){
-		firstPackage = false;
-	    }else {
-		iplist.remove(deleteObject);
-	    }
+	    iplist.remove(deleteObject);
 	}
 	
 	return iplist;
@@ -172,18 +167,39 @@ public class Aufgabe4
 
 	//bad code follows. I appreciate any hint to make it better
 	for (IpPackage ipkg : iplist){
-	    for (TrptPackage tpgk : trptlist){
-		//		if(ipkg.
+	    for (TrptPackage tpkg : trptlist){
+		if(ipkg.getSeqNr().equals(tpkg.getSeqNr())){
+		    ipkg.setTrptNr(tpkg.getNr());
+		    ipkg.setRto(tpkg.getRto());
+		}
 	    }
 	}
-	return new ArrayList<IpPackage>();
+	return iplist;
     }
 
-    public static void calculateRtt(){
+    public static ArrayList<IpPackage> calculateRtt(ArrayList<IpPackage> ipkglist){
+
+	DateFormat formatter = new SimpleDateFormat("HH:mm:ss.SSSSSS");
+
+	for (IpPackage ipkg : ipkglist){
+	    if(ipkg.getTimestamp()!=null && ipkg.getAckTimestamp()!=null){
+		try{
+		    Date date1 = formatter.parse(ipkg.getTimestamp());
+		    Date date2 = formatter.parse(ipkg.getAckTimestamp());
+		    ipkg.setRtt("" + (((double)date2.getTime()-(double)date1.getTime())/1000000));
+		}catch (ParseException e){
+		    System.out.println("Parse Exception");
+		}
+	    }
+	}
+	return ipkglist;
     }
 
-    public static void printCsv(ArrayList<IpPackage> ippackagelist, ArrayList<TrptPackage> trptpackageList){
-	System.out.println();
+    public static void printCsv(ArrayList<IpPackage> ipkglist){
+	System.out.println("TcpdumpNr, TrptNr, AckNr, Sendezeit, Empfangszeit, SeqNr, RTT, RTO");
+	for (IpPackage pkg : ipkglist){
+	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getTrptNr() + ", " + pkg.getAckIn() + ", " + pkg.getTimestamp() + ", " + pkg.getAckTimestamp() + ", " + pkg.getSeqNr() + ", " + pkg.getRtt() + ", " + pkg.getRto());
+	}
 	
     }
     

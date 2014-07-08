@@ -83,6 +83,14 @@ public class IpPackage{
     public void setTrptNr(String trptNr){
 	this.trptNr = trptNr;
     }
+
+    public void setRto(String rto){
+	this.rto = rto;
+    }
+
+    public void setRtt(String rtt){
+	this.rtt = rtt;
+    }
     
     
 }
