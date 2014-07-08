@@ -85,17 +85,24 @@ public class Aufgabe4
 	    String ackNr = "";
 	    String rseqNr = "";
 	    String timestamp = "";
-	    
+	    int length = -1;
+	    	    
 	    while ((line = br.readLine()) !=null) {
 		if(line.matches("^([0-9][0-9]:){2}[0-9]{2}\\.[0-9]{6} IP .*"))
 		    {
 			output=new String(line);
 			nr++;
 			timestamp = line.split(" ")[0];
+
 			for (int i=0; i < 4; i++)
 			    {
 				if ((line = br.readLine()) != null){
 				    output = output + "\n" + line;
+				    if (i==0){
+					String[] tmparray = line.split(",");
+					length = Integer.parseInt(tmparray[tmparray.length-1].split(" ")[2]);
+				    }
+				    
 				    /*
 				    if (i == 0 && line.matches(".*, ack [0-9]{2,12}, .*")){
 					rseqNr = line.split(",")[2];
@@ -123,7 +130,7 @@ public class Aufgabe4
 					}
 				}
 			    }
-			ipPackageList.add(new IpPackage(""+nr, output, seqNr, "rtt", "rto", timestamp, rseqNr, ackNr));
+			ipPackageList.add(new IpPackage(""+nr, output, seqNr, "rtt", "rto", timestamp, rseqNr, ackNr, length));
 			ackNr = new String();
 		    }
 	    }
@@ -143,13 +150,22 @@ public class Aufgabe4
 	long oneSeqNr = Long.parseLong(iplist.get(1).getSeqNr(), 16);
 	oneSeqNr++;
 	String refSeqNr = Long.toHexString(oneSeqNr);
+	Long firstSeqNr = Long.parseLong(iplist.get(0).getSeqNr(), 16);
 	
 	for (IpPackage ipkg : iplist){
 	    if (ipkg.getSeqNr().equals(refSeqNr)){
 		deleteList.add(ipkg);
 	    }else {
 		for (IpPackage ipkg2 : iplist){
-		    if (ipkg.getSeqNr().equals(ipkg2.getAckNr())){
+
+		    String upperSeqNr = ipkg.getSeqNr();
+		    long lUpperSeqNr = Long.parseLong(upperSeqNr, 16);
+		    lUpperSeqNr = lUpperSeqNr + ipkg.getLength();
+		    upperSeqNr = Long.toHexString(lUpperSeqNr);
+		    long seqInfo = Long.parseLong(ipkg.getSeqNr(),16) - firstSeqNr;
+		    ipkg.setSeqInfo(seqInfo);
+		    
+		    if (upperSeqNr.equals(ipkg2.getAckNr())){
 			ipkg.setAckIn(ipkg2.getTcpdumpNr());
 			ipkg.setAckTimestamp(ipkg2.getTimestamp());
 		    }
@@ -196,9 +212,9 @@ public class Aufgabe4
     }
 
     public static void printCsv(ArrayList<IpPackage> ipkglist){
-	System.out.println("TcpdumpNr, TrptNr, AckNr, Sendezeit, Empfangszeit, SeqNr, RTT, RTO");
+	System.out.println("TcpdumpNr, TrptNr, AckNr, Sendezeit, Empfangszeit, SeqNr, RTT, RTO, SeqInfo");
 	for (IpPackage pkg : ipkglist){
-	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getTrptNr() + ", " + pkg.getAckIn() + ", " + pkg.getTimestamp() + ", " + pkg.getAckTimestamp() + ", " + pkg.getSeqNr() + ", " + pkg.getRtt() + ", " + pkg.getRto());
+	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getTrptNr() + ", " + pkg.getAckIn() + ", " + pkg.getTimestamp() + ", " + pkg.getAckTimestamp() + ", " + pkg.getSeqNr() + ", " + pkg.getRtt() + ", " + pkg.getRto() + ", " + pkg.getSeqInfo());
 	}
 	
     }
