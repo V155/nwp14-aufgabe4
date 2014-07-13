@@ -22,12 +22,13 @@ public class Aufgabe4
 	ArrayList<IpPackage> list4 = calculateRtt(list3);
 	ArrayList<IpPackage> list5 = mergeLists(list4, list2);
 	printCsv(list5);
+	printDumps(list1, list2);
 	
 	
     }
 
     public static ArrayList<TrptPackage> readTrptdump(){
-	ArrayList<TrptPackage> trptPackageList = new ArrayList();
+	ArrayList<TrptPackage> trptPackageList = new ArrayList<TrptPackage>();
 
 	try{
 	    BufferedReader br = new BufferedReader(new FileReader("trptdump.dump"));
@@ -36,20 +37,26 @@ public class Aufgabe4
 	    String seqNr = "";
 	    String rto = "";
 	    String nr = "";
+	    String ackNr = "";
 
 	    while ((line = br.readLine()) != null) {
 		if(line.matches("^[0-9]{3} (FIN_WAIT_1:input|ESTABLISHED:output|ESTABLISHED:input|SYN_SENT:input|SYN_SENT:output) .*")){
 		    output = new String(line);
 		    nr = line.split(" ")[0];
-		    if(line.matches("^[0-9]{3} (ESTABLISHED:input|SYN_SENT:input|SYN_SENT:output) .*")){
+		    
+		    if (line.matches(".*\\)[0-9a-f]{6}.*")){
 			int index1 = line.indexOf(')')+1;
+			int index2 = line.indexOf('@')+1;
+			int index3 = line.indexOf('(', index1);
 			seqNr = new String(line.substring(index1,index1+8));
-		    }else if(line.matches("^[0-9]{3} (ESTABLISHED:output) .*")){
-			int index1 = line.indexOf(')')+2;
+			ackNr = new String(line.substring(index2, index3));
+			if(ackNr.equals("0")) ackNr = "00000000"; 
+			
+		    } else if(line.matches(".*\\)\\[[0-9a-f]{6}.*")){
+			int index1 = line.indexOf("..")+1;
+			int index2 = line.indexOf('@')+1;
 			seqNr = new String(line.substring(index1,index1+8));
-		    }else if(line.matches("^[0-9]{3} (FIN_WAIT_1:input) .*")){
-			int index1 = line.indexOf('@')+1;
-			seqNr = new String(line.substring(index1,index1+8));
+			ackNr = new String(line.substring(index2, index2+8));
 		    }
 		    for(int i = 0; i < 4; i++){
 			if ((line = br.readLine()) != null){
@@ -59,8 +66,10 @@ public class Aufgabe4
 			    }
 			}
 		    }
-		    trptPackageList.add(new TrptPackage(nr, output, seqNr, rto));
+		    trptPackageList.add(new TrptPackage(nr, output, seqNr, rto, ackNr));
+
 		}
+
 	    }
 	    br.close();
 	    
@@ -69,12 +78,17 @@ public class Aufgabe4
 	}
 	catch(IOException e){
 	}
+	for (TrptPackage tp : trptPackageList){
+	    if(tp.getNr().equals("931")){
+		System.out.println("Nr: " + tp.getNr() + " SeqNr: " + tp.getSeqNr() + " AckNr: " + tp.getAckNr());
+	    }
+	}
 	return trptPackageList;
     }
 		    
     
     public static ArrayList<IpPackage> readTcpdump(){
-	ArrayList<IpPackage> ipPackageList = new ArrayList();
+	ArrayList<IpPackage> ipPackageList = new ArrayList<IpPackage>();
 	
 	try{
 	    BufferedReader br = new BufferedReader(new FileReader("tcpdump.dump"));
@@ -145,7 +159,7 @@ public class Aufgabe4
     public static ArrayList<IpPackage> mergePackages(ArrayList<IpPackage> iplist){
 
 
-	ArrayList<IpPackage> deleteList = new ArrayList();
+	ArrayList<IpPackage> deleteList = new ArrayList<IpPackage>();
 
 	long oneSeqNr = Long.parseLong(iplist.get(1).getSeqNr(), 16);
 	oneSeqNr++;
@@ -219,10 +233,40 @@ public class Aufgabe4
     public static void printCsv(ArrayList<IpPackage> ipkglist){
 	System.out.println("TcpdumpNr, TrptNr, AckNr, Sendezeit, Empfangszeit, SeqNr, RTT, RTO, SeqInfo, Sendezeit");
 	for (IpPackage pkg : ipkglist){
-	    System.out.println(pkg.getTcpdumpNr() + ", " + pkg.getTrptNr() + ", " + pkg.getAckIn() + ", " + pkg.getTimestamp() + ", " + pkg.getAckTimestamp() + ", " + pkg.getSeqNr() + ", " + pkg.getRtt() + ", " + pkg.getRto() + ", " + pkg.getSeqInfo() + ", " + pkg.getMsecs());
+	    System.err.println(pkg.getTcpdumpNr() + ", " + pkg.getTrptNr() + ", " + pkg.getAckIn() + ", " + pkg.getTimestamp() + ", " + pkg.getAckTimestamp() + ", " + pkg.getSeqNr() + ", " + pkg.getRtt() + ", " + pkg.getRto() + ", " + pkg.getSeqInfo() + ", " + pkg.getMsecs());
 	}
 	
     }
+
+    public static void printDumps(ArrayList<IpPackage> iplist, ArrayList<TrptPackage> trptlist){
+
+	//bad code follows. I appreciate any hint to make it better
+
+	for (IpPackage ipkg : iplist){
+	    for (TrptPackage tpkg : trptlist){
+		if(ipkg.getSeqNr().equals(tpkg.getSeqNr()) && ipkg.getAckNr().equals(tpkg.getAckNr())){
+		}else{
+		    System.out.println(ipkg.getTcpdumpNr() + " " + ipkg.getSeqNr() + " " + ipkg.getAckNr() + " " + tpkg.getSeqNr() + " " + tpkg.getAckNr());
+		}
+		    
+		
+	    }
+	}
+	
+	for (IpPackage ipkg : iplist){
+	    for (TrptPackage tpkg : trptlist){
+		if(ipkg.getSeqNr().equals(tpkg.getSeqNr()) && ipkg.getAckNr().equals(tpkg.getAckNr())){
+		    System.out.println(ipkg.getTcpdumpNr());
+		    System.out.println(ipkg.getDump());
+		    System.out.println("\n" + tpkg.getDump());
+		    System.out.println("--------------------------------");
+		    
+		}
+	    }
+	}
+    }
+
+    
     
 }
 
