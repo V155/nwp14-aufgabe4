@@ -237,7 +237,7 @@ public class Aufgabe4
     }
 
     public static void printCsv(ArrayList<IpPackage> ipkglist){
-	System.out.println("TcpdumpNr, TrptNr, AckNr, Sendezeit, Empfangszeit, SeqNr, RTT, RTO, SeqInfo, Sendezeit");
+	System.err.println("TcpdumpNr, TrptNr, AckNr, Sendezeit, Empfangszeit, SeqNr, RTT, RTO, SeqInfo, Sendezeit");
 	for (IpPackage pkg : ipkglist){
 	    System.err.println(pkg.getTcpdumpNr() + ", " + pkg.getTrptNr() + ", " + pkg.getAckIn() + ", " + pkg.getTimestamp() + ", " + pkg.getAckTimestamp() + ", " + pkg.getSeqNr() + ", " + pkg.getRtt() + ", " + pkg.getRto() + ", " + pkg.getSeqInfo() + ", " + pkg.getMsecs());
 	}
