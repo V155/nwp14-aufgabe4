@@ -18,13 +18,13 @@ public class Aufgabe4
     {
 	ArrayList<IpPackage> list1 = readTcpdump();
 	//	for (IpPackage ipkg : list1){
-	//    System.out.println(ipkg.getTimestamp() + " " + ipkg.getSeqNr());
-	//}
+	//	    System.out.println(ipkg.getAckNr() + " " + ipkg.getSeqNr() + " " + ipkg.getLength());
+	//	}
 	ArrayList<TrptPackage> list2 = readTrptdump();
 	printDumps(list1, list2);
-	/*	for (TrptPackage tpkg : list2){
-	    System.out.println(tpkg.getSeqNr() + " " + tpkg.getAckNr() + "\n-----------------------");
-	}*/
+	//	for (TrptPackage tpkg : list2){
+	//	    System.out.println(tpkg.getSeqNr() + " " + tpkg.getAckNr() + "\n-----------------------");
+	//	}
 	ArrayList<IpPackage> list3 = mergePackages(list1);
 	ArrayList<IpPackage> list4 = calculateRtt(list3);
 	ArrayList<IpPackage> list5 = mergeLists(list4, list2);
@@ -126,14 +126,22 @@ public class Aufgabe4
 			output=new String(line);
 			nr++;
 			timestamp = line.split(" ")[0];
+			String seqLen = (line.split(" ")[6]);
+			int seqLenInd1 = seqLen.indexOf("(");
+			int seqLenInd2 = seqLen.indexOf(")");
+			if (seqLenInd1 > 0 && seqLenInd2 > 0){
+			    length = Integer.parseInt(seqLen.substring(seqLenInd1+1, seqLenInd2));
+			}
+			//			System.out.println(length);
 
 			for (int i=0; i < 4; i++)
 			    {
 				if ((line = br.readLine()) != null){
 				    output = output + "\n" + line;
 				    if (i==0){
-					String[] tmparray = line.split(",");
-					length = Integer.parseInt(tmparray[tmparray.length-1].split(" ")[2], 16);
+					//					String[] tmparray = line.split(",");
+					//System.out.println(line);
+					//length = Integer.parseInt(tmparray[tmparray.length-1].split(" ")[2], 16);
 				    }
 				    
 				    /*
@@ -154,7 +162,7 @@ public class Aufgabe4
 
 					}*/
 
-				    if (i == 3)
+				    if (i == 2)
 					{
 					    //seqNr = new String(line.substring(25,29) + line.substring(30,34));
 					    String[] splitline = line.split(" ");
