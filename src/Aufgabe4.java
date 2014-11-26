@@ -58,13 +58,24 @@ public class Aufgabe4
 			int index3 = line.indexOf('(', index1);
 			seqNr = new String(line.substring(index1,index1+8));
 			ackNr = new String(line.substring(index2, index3));
-			if(ackNr.equals("0")) ackNr = "00000000"; 
-			
+			while (ackNr.length() < 8){
+			    ackNr = "0"+ackNr;
+			}
+			while (seqNr.length() < 8){
+			    seqNr = "0"+seqNr;
+			}
 		    } else if(line.matches(".*\\)\\[[0-9a-f]{6}.*")){
 			int index1 = line.indexOf("..")+2;
 			int index2 = line.indexOf('@')+1;
-			seqNr = new String(line.substring(index1,index1+8));
-			ackNr = new String(line.substring(index2, index2+8));
+			int index3 = line.indexOf('(', index1);
+			seqNr = new String(line.substring(index1,index2-2));
+			ackNr = new String(line.substring(index2, index3));
+			while (ackNr.length() < 8){
+			    ackNr = "0"+ackNr;
+			}
+			while (seqNr.length() < 8){
+			    seqNr = "0"+seqNr;
+			}
 		    }
 		    for(int i = 0; i < 4; i++){
 			if ((line = br.readLine()) != null){
