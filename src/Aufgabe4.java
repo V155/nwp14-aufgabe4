@@ -17,6 +17,9 @@ public class Aufgabe4
     public static void main(String args[])
     {
 	ArrayList<IpPackage> list1 = readTcpdump();
+	//	for (IpPackage ipkg : list1){
+	//    System.out.println(ipkg.getTimestamp() + " " + ipkg.getSeqNr());
+	//}
 	ArrayList<TrptPackage> list2 = readTrptdump();
 	printDumps(list1, list2);
 	/*	for (TrptPackage tpkg : list2){
@@ -27,7 +30,7 @@ public class Aufgabe4
 	ArrayList<IpPackage> list5 = mergeLists(list4, list2);
 	printCsv(list5);
 
-	//	printDumps(list1, list2);
+	////	printDumps(list1, list2);
 	
 	
     }
@@ -119,7 +122,7 @@ public class Aufgabe4
 				    output = output + "\n" + line;
 				    if (i==0){
 					String[] tmparray = line.split(",");
-					length = Integer.parseInt(tmparray[tmparray.length-1].split(" ")[2]);
+					length = Integer.parseInt(tmparray[tmparray.length-1].split(" ")[2], 16);
 				    }
 				    
 				    /*
