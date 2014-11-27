@@ -188,45 +188,49 @@ public class Aufgabe4
 
 
 	ArrayList<IpPackage> deleteList = new ArrayList<IpPackage>();
-
-	long oneSeqNr = Long.parseLong(iplist.get(1).getSeqNr(), 16);
-	oneSeqNr++;
-	String refSeqNr = Long.toHexString(oneSeqNr);
-	Long firstSeqNr = Long.parseLong(iplist.get(0).getSeqNr(), 16);
-	
-	for (IpPackage ipkg : iplist){
-	    if (ipkg.getSeqNr().equals(refSeqNr)){
-		deleteList.add(ipkg);
-	    }else {
-		for (IpPackage ipkg2 : iplist){
-
-		    String upperSeqNr = ipkg.getSeqNr();
-		    long lUpperSeqNr = Long.parseLong(upperSeqNr, 16);
-		    lUpperSeqNr = lUpperSeqNr + ipkg.getLength();
-		    upperSeqNr = Long.toHexString(lUpperSeqNr);
-
-		    while (upperSeqNr.length() < 8){
+	if (iplist.isEmpty()){
+	    System.out.println("No input files provided");
+	    return new ArrayList<IpPackage>();
+	}else{
+	    long oneSeqNr = Long.parseLong(iplist.get(1).getSeqNr(), 16);
+	    oneSeqNr++;
+	    String refSeqNr = Long.toHexString(oneSeqNr);
+	    Long firstSeqNr = Long.parseLong(iplist.get(0).getSeqNr(), 16);
+	    
+	    for (IpPackage ipkg : iplist){
+		if (ipkg.getSeqNr().equals(refSeqNr)){
+		    deleteList.add(ipkg);
+		}else {
+		    for (IpPackage ipkg2 : iplist){
+			
+			String upperSeqNr = ipkg.getSeqNr();
+			long lUpperSeqNr = Long.parseLong(upperSeqNr, 16);
+			lUpperSeqNr = lUpperSeqNr + ipkg.getLength();
+			upperSeqNr = Long.toHexString(lUpperSeqNr);
+			
+			while (upperSeqNr.length() < 8){
 			    upperSeqNr = "0"+upperSeqNr;
+			}
+			
+			if (upperSeqNr.equals(ipkg2.getAckNr())){
+			    ipkg.setAckIn(ipkg2.getTcpdumpNr());
+			    ipkg.setAckTimestamp(ipkg2.getTimestamp());
+			}
+			
 		    }
+		    long seqInfo = Long.parseLong(ipkg.getSeqNr(),16) - firstSeqNr;
+		    ipkg.setSeqInfo(seqInfo);
 		    
-		    if (upperSeqNr.equals(ipkg2.getAckNr())){
-			ipkg.setAckIn(ipkg2.getTcpdumpNr());
-			ipkg.setAckTimestamp(ipkg2.getTimestamp());
-		    }
+		    ipkg.setMsecs(ipkg.getTimestamp().split("\\.")[1]);
 		    
 		}
-		long seqInfo = Long.parseLong(ipkg.getSeqNr(),16) - firstSeqNr;
-		ipkg.setSeqInfo(seqInfo);
-		
-		ipkg.setMsecs(ipkg.getTimestamp().split("\\.")[1]);
-
 	    }
+	    for (IpPackage deleteObject : deleteList){
+		iplist.remove(deleteObject);
+	    }
+	    
+	    return iplist;
 	}
-	for (IpPackage deleteObject : deleteList){
-	    iplist.remove(deleteObject);
-	}
-	
-	return iplist;
     }
 
     public static ArrayList<IpPackage> mergeLists(ArrayList<IpPackage> iplist, ArrayList<TrptPackage> trptlist){
